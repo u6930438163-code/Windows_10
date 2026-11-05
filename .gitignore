@@ -1,0 +1,29 @@
+# Windows images/media and virtual-machine disks (do not upload proprietary OS files)
+*.iso
+*.img
+*.wim
+*.esd
+*.vhd
+*.vhdx
+*.vmdk
+*.vdi
+*.qcow2
+*.ova
+*.ovf
+
+# Secrets, keys, credentials
+.env
+.env.*
+*.pfx
+*.p12
+*.pem
+*.key
+*.kdbx
+*product-key*
+*license-key*
+
+# System/editor artifacts
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
