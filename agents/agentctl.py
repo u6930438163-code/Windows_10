@@ -3,6 +3,7 @@ import argparse
 import hmac
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
 
@@ -13,6 +14,8 @@ def serve(bridge, port):
     token = os.environ.get("WINDOWS10_LOCAL_TOKEN", "")
     if len(token) < 16:
         raise SystemExit("Ustaw WINDOWS10_LOCAL_TOKEN (min. 16 znaków) przed uruchomieniem serwera.")
+
+    gateway_jobs = ThreadPoolExecutor(max_workers=4, thread_name_prefix="agent-delivery")
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, fmt, *args):
@@ -69,13 +72,22 @@ def serve(bridge, port):
                     self.reply(413, {"error": "invalid body size"})
                     return
                 body = json.loads(self.rfile.read(size).decode("utf-8"))
-                self.reply(200, {"messages": bridge.send(body["sender"], body["recipient"], body["message"])})
+                messages = bridge.send(body["sender"], body["recipient"], body["message"], deliver=False)
+                if bridge.gateway_url and bridge.send_path:
+                    for message in messages:
+                        if message["state"] == "queued":
+                            gateway_jobs.submit(bridge._deliver, message["id"])
+                self.reply(202, {"messages": messages})
             except (KeyError, ValueError, TypeError, UnicodeError) as exc:
                 self.reply(400, {"error": str(exc)})
 
     print("Serwer lokalny: http://127.0.0.1:" + str(port))
-    with ThreadingHTTPServer(("127.0.0.1", port), Handler) as httpd:
-        httpd.serve_forever()
+    try:
+        with ThreadingHTTPServer(("127.0.0.1", port), Handler) as httpd:
+            httpd.daemon_threads = True
+            httpd.serve_forever()
+    finally:
+        gateway_jobs.shutdown(wait=False, cancel_futures=True)
 
 
 def main():
