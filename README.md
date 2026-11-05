@@ -1,32 +1,62 @@
 # Windows_10
 
-Minimalny, czysty projekt startowy Windows 10 — **bez plików systemu Windows**.
+Windows 10 — czysty projekt konfiguracyjny: instalacja systemu, **dotykowy pulpit Windows**, wirtualizacja, narzędzia OpenAI oraz lokalne kanały czterech istniejących agentów **Alex, Aria, Astyria, Aurelius**.
 
-To repozytorium zawiera instrukcje legalnego pobrania Windows 10 od Microsoft, weryfikacji obrazu ISO oraz dwa bezpieczne skrypty PowerShell do diagnostyki. **Nie zawiera Windows 10, jego kodu źródłowego, obrazów ISO ani kluczy licencyjnych.**
+**To nie jest obraz ISO ani kopia systemu Windows.** Repozytorium zawiera skrypty i instrukcje. Uruchomienie funkcji wymaga urządzenia z Windows 10 i odpowiedniego sprzętu. Licencji, ISO oraz sekretów nie umieszczamy na GitHubie.
 
-## Pierwsze kroki
+## Pulpit dotykowy — uruchom
 
-1. Przeczytaj [instrukcję czystej instalacji](docs/INSTALACJA.md).
-2. Pobierz oficjalny obraz lub narzędzie Media Creation Tool ze strony Microsoft: https://www.microsoft.com/pl-pl/software-download/windows10
-3. Jeśli pobrano ISO, sprawdź sumę SHA-256:
-   ```powershell
-   .\scripts\Test-Windows10Media.ps1 -IsoPath 'C:\Users\TwojaNazwa\Downloads\Win10.iso'
-   ```
-   Jeśli znasz oficjalną sumę SHA-256 odpowiadającą dokładnie Twojemu obrazowi ISO, użyj również `-ExpectedSha256`.
-4. Na komputerze z Windows uruchom bezpieczną diagnostykę (tylko odczyt):
-   ```powershell
-   .\scripts\Get-Windows10Status.ps1
-   ```
+Na komputerze Windows, w PowerShell:
 
-## Zawartość
+```powershell
+git clone https://github.com/u6930438163-code/Windows_10.git
+cd Windows_10
+.\scripts\Test-TouchScreen.ps1
+.\scripts\Launch-TouchWorkspace.ps1
+```
 
-- `docs/INSTALACJA.md` — czysta instalacja Windows 10 i uwagi o licencjach.
-- `scripts/Test-Windows10Media.ps1` — oblicza SHA-256 ISO i opcjonalnie porównuje z oczekiwaną wartością.
-- `scripts/Get-Windows10Status.ps1` — wyświetla informacje o systemie Windows; niczego nie modyfikuje.
-- `.gitignore` — zapobiega przypadkowemu dodaniu obrazów systemowych i tajnych plików.
+Aby utworzyć **skrót na pulpicie** (dopiero na wyraźne żądanie):
+
+```powershell
+.\scripts\Install-TouchShortcut.ps1 -Create
+```
+
+To uruchamia duży panel WPF z przyciskami obsługiwanymi palcem lub myszą. Daje szybki dostęp do: Eksploratora, Ustawień, trybu tabletu, dotyku, klawiatury ekranowej, skali wyświetlania, PowerShell, Menedżera zadań, ChatGPT, Codex i kanałów agentów.
+
+**Pełny dotyk w Windows 10** zapewniają sterownik ekranu dotykowego i wbudowany tryb tabletu. Nasza nakładka nie zamienia monitora bez dotyku w panel dotykowy i nie zmienia wstecznie interfejsów obcych aplikacji. Instrukcja: [Panel i ustawienia dotyku](ui/README.md).
+
+## Moduły
+
+| Kategoria | Zawartość |
+| --- | --- |
+| Czysta instalacja Windows | [Instrukcja i pobieranie oryginalnego ISO](docs/INSTALACJA.md) |
+| Wirtualizacja Hyper-V | [Diagnostyka i kontrolowane tworzenie VM](docs/WINDOWS-VM.md) |
+| OpenAI | [ChatGPT, Codex, OpenAI SDK, MCP i bezpieczny instalator](docs/OPENAI-APPS.md) |
+| Agenci AI | [Lokalny czat dwukierunkowy, SQLite, HTTP API, MCP](agents/README.md) |
+| Pulpit dotykowy | [Uruchamianie panelu WPF i systemowych funkcji dotykowych](ui/README.md) |
+
+## Lokalni agenci (bez udawania odpowiedzi AI)
+
+```powershell
+python agents/agentctl.py status
+python agents/agentctl.py send --from user --to Alex --text "Status"
+python agents/agentctl.py inbox --agent Alex
+```
+
+Tożsamości agentów są zachowane, a komunikacja między nimi może być kolejkowana lokalnie. **Faktyczne odpowiedzi i praca agentów wymagają podłączenia zgodnego, uwierzytelnionego backendu.** Bez niego nie są online, a polecenia pozostają w kolejce.
+
+## Instalacja narzędzi OpenAI — tylko na żądanie
+
+```powershell
+.\scripts\Install-OpenAITools.ps1
+.\scripts\Install-OpenAITools.ps1 -InstallChatGPT -WhatIf
+```
+
+Uruchomienie skryptu bez przełączników nic nie instaluje.
 
 ## Bezpieczeństwo i wsparcie
 
-Standardowe wydania Windows 10 osiągnęły koniec wsparcia **14 października 2025 r.** Sprawdź program ESU lub wybierz wspierany system operacyjny, zwłaszcza do pracy w sieci.
-
-To jest własny projekt pomocniczy, **nieoficjalny projekt Microsoft**.
+- Skrypty dotykowe nie zmieniają ani nie zastępują systemowej powłoki Windows.
+- Żadnych zaszytych kluczy API ani automatycznej pełnej kontroli nad PowerShell przez AI.
+- Standardowe wsparcie Windows 10 zakończyło się **14 października 2025 r.** Sprawdź ESU, jeśli planujesz korzystanie z Windows 10 w sieci.
+- To **nieoficjalny projekt pomocniczy**, a nie produkt Microsoft ani OpenAI.
