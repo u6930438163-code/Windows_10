@@ -63,3 +63,7 @@ W aplikacji obsługującej MCP dodaj serwer stdio wskazujący interpreter Python
 2. Wysyłka i faktyczne przetworzenie poleceń przez zewnętrznych agentów wymagają poprawnego URL, zgodnego endpointu i autoryzacji.
 3. Bezpieczeństwo: nie dodajemy root/admin, autostartu ani wykonywania arbitralnego PowerShell przez agentów.
 4. Zadania, historia, obsługa workerów, streaming i prawdziwa komunikacja 24/7 wymagają dodatkowych procesów oraz potwierdzonych usług.
+
+## Panel dotykowy Windows
+
+Uruchom `scripts/Start-TouchShell.ps1` (Windows PowerShell 5.1, WPF). Panel pozwala wybierać odbiorcę palcem i wysyłać wiadomości do lokalnej skrzynki. Instrukcja: [ui/README.md](../ui/README.md). Panel działa niezależnie od zewnętrznego backendu, ale **bez sprawnego API agentów nie generuje ich odpowiedzi**.
