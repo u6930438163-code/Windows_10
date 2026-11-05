@@ -12,7 +12,7 @@ jobs:
         shell: pwsh
         run: |
           $errorsFound = $false
-          Get-ChildItem -Path scripts -Filter '*.ps1' -Recurse | ForEach-Object {
+          Get-ChildItem -Path scripts,ui -Filter '*.ps1' -Recurse | ForEach-Object {
             $tokens = $null
             $parseErrors = $null
             [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$parseErrors) | Out-Null
