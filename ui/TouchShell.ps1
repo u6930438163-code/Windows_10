@@ -74,6 +74,7 @@ Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
           <Button x:Name="SettingsButton" Style="{StaticResource TouchButton}" Content="Ustawienia" />
           <Button x:Name="KeyboardButton" Style="{StaticResource TouchButton}" Content="Klawiatura ekranowa" />
           <Button x:Name="TouchSettingsButton" Style="{StaticResource TouchButton}" Content="Ustawienia dotyku" />
+          <Button x:Name="TabletButton" Style="{StaticResource TouchButton}" Content="Tryb tabletu" />
           <Button x:Name="StartButton" Style="{StaticResource TouchButton}" Content="Menu Start" />
           <Button x:Name="TaskManagerButton" Style="{StaticResource TouchButton}" Content="Menedżer zadań" />
           <Button x:Name="TerminalButton" Style="{StaticResource TouchButton}" Content="PowerShell" />
@@ -161,7 +162,8 @@ function ShowResult([object]$Result) {
 (Get-UIElement "MinimizeButton").Add_Click({ $window.WindowState = "Minimized" })
 (Get-UIElement "FilesButton").Add_Click({ Launch "explorer.exe" })
 (Get-UIElement "SettingsButton").Add_Click({ Launch "explorer.exe" "ms-settings:" })
-(Get-UIElement "TouchSettingsButton").Add_Click({ Launch "explorer.exe" "ms-settings:devices-touchpad" })
+(Get-UIElement "TouchSettingsButton").Add_Click({ Launch "explorer.exe" "ms-settings:devices-touch" })
+(Get-UIElement "TabletButton").Add_Click({ Launch "explorer.exe" "ms-settings:tabletmode" })
 (Get-UIElement "DisplayButton").Add_Click({ Launch "explorer.exe" "ms-settings:display" })
 (Get-UIElement "StartButton").Add_Click({
     # Nie wstrzykujemy syntetycznych klawiszy; otwieramy systemowy folder aplikacji Start.
