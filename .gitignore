@@ -36,3 +36,6 @@ Desktop.ini
 .venv/
 __pycache__/
 *.py[cod]
+
+# Local Windows VM installation state and private logs
+vm/
