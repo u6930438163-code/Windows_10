@@ -32,7 +32,7 @@ To uruchamia duży panel WPF z przyciskami obsługiwanymi palcem lub myszą. Daj
 | Czysta instalacja Windows | [Instrukcja i pobieranie oryginalnego ISO](docs/INSTALACJA.md) |
 | Wirtualizacja Hyper-V | [Diagnostyka i kontrolowane tworzenie VM](docs/WINDOWS-VM.md) |
 | OpenAI | [ChatGPT, Codex, OpenAI SDK, MCP i bezpieczny instalator](docs/OPENAI-APPS.md) |
-| Agenci AI | [Lokalny czat dwukierunkowy, SQLite, HTTP API, MCP](agents/README.md) |
+| Agenci AI | [Lokalny czat z historią, kolejką, SQLite, HTTP API, MCP](agents/README.md) |
 | Pulpit dotykowy | [Uruchamianie panelu WPF i systemowych funkcji dotykowych](ui/README.md) |
 
 ## Lokalni agenci (bez udawania odpowiedzi AI)
@@ -60,3 +60,7 @@ Uruchomienie skryptu bez przełączników nic nie instaluje.
 - Żadnych zaszytych kluczy API ani automatycznej pełnej kontroli nad PowerShell przez AI.
 - Standardowe wsparcie Windows 10 zakończyło się **14 października 2025 r.** Sprawdź ESU, jeśli planujesz korzystanie z Windows 10 w sieci.
 - To **nieoficjalny projekt pomocniczy**, a nie produkt Microsoft ani OpenAI.
+
+## Zmiany interfejsu dotykowego
+
+Historia czatu jest pokazana ponad polem wysyłania, odświeża się co 8 sekund i jest rozdzielona na kanały czterech agentów oraz zbiorczy kanał `all`. Pod czatem dostępny jest pulpit narzędzi Windows. Zdalna integracja z modelami AI nie została jeszcze zweryfikowana i wymaga prawidłowego API oraz uwierzytelnienia.
