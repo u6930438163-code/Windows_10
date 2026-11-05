@@ -68,6 +68,34 @@ Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly">
       <StackPanel>
+        <TextBlock Text="ROZMOWY Z AGENTAMI AI" FontSize="17" FontWeight="Bold"
+                   Foreground="#9DC5E8" Margin="7,20,0,8" />
+        <StackPanel Margin="6,0,6,0">
+          <TextBlock Text="Kanał rozmowy" FontSize="16" />
+          <ComboBox x:Name="AgentSelector" FontSize="20" Height="55"
+                    Background="#F1F5F9" Foreground="#15263E" SelectedIndex="0">
+            <ComboBoxItem Content="Alex" />
+            <ComboBoxItem Content="Aria" />
+            <ComboBoxItem Content="Astyria" />
+            <ComboBoxItem Content="Aurelius" />
+            <ComboBoxItem Content="all" />
+          </ComboBox>
+          <TextBlock Text="Historia rozmowy • stan queued = oczekuje na wykonanie" FontSize="15" Margin="0,12,0,4" />
+          <TextBox x:Name="OutputBox" MinHeight="400" MaxHeight="850"
+                   IsReadOnly="True" FontFamily="Segoe UI" FontSize="19"
+                   TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                   Foreground="#E4F3FE" Background="#152338" Padding="10" />
+          <TextBlock Text="Wiadomość" FontSize="16" Margin="0,14,0,0" />
+          <TextBox x:Name="MessageBox" Height="120" FontSize="19" TextWrapping="Wrap"
+                   AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                   Foreground="#111827" Background="#FFFFFF" Padding="10" />
+          <WrapPanel Margin="0,8,0,0">
+            <Button x:Name="SendButton" Style="{StaticResource ActionButton}" Content="Wyślij" />
+            <Button x:Name="StatusButton" Style="{StaticResource ActionButton}" Content="Status agentów" />
+            <Button x:Name="InboxButton" Style="{StaticResource ActionButton}" Content="Odśwież rozmowę" />
+          </WrapPanel>
+
+        </StackPanel>
         <TextBlock Text="SYSTEM" FontSize="17" FontWeight="Bold" Foreground="#9DC5E8" Margin="7,0,0,8" />
         <WrapPanel>
           <Button x:Name="FilesButton" Style="{StaticResource TouchButton}" Content="Pliki" />
@@ -86,33 +114,6 @@ Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
           <Button x:Name="CodexButton" Style="{StaticResource TouchButton}" Content="Codex" />
           <Button x:Name="BrowserButton" Style="{StaticResource TouchButton}" Content="Przeglądarka" />
         </WrapPanel>
-        <TextBlock Text="AGENTY AI — WIADOMOŚCI" FontSize="17" FontWeight="Bold"
-                   Foreground="#9DC5E8" Margin="7,20,0,8" />
-        <StackPanel Margin="6,0,6,0">
-          <TextBlock Text="Adresat" FontSize="16" />
-          <ComboBox x:Name="AgentSelector" FontSize="20" Height="55"
-                    Background="#F1F5F9" Foreground="#15263E" SelectedIndex="0">
-            <ComboBoxItem Content="Alex" />
-            <ComboBoxItem Content="Aria" />
-            <ComboBoxItem Content="Astyria" />
-            <ComboBoxItem Content="Aurelius" />
-            <ComboBoxItem Content="all" />
-          </ComboBox>
-          <TextBlock Text="Wiadomość" FontSize="16" Margin="0,14,0,0" />
-          <TextBox x:Name="MessageBox" Height="105" FontSize="19" TextWrapping="Wrap"
-                   AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
-                   Foreground="#111827" Background="#FFFFFF" Padding="10" />
-          <WrapPanel Margin="0,8,0,0">
-            <Button x:Name="SendButton" Style="{StaticResource ActionButton}" Content="Wyślij" />
-            <Button x:Name="StatusButton" Style="{StaticResource ActionButton}" Content="Status agentów" />
-            <Button x:Name="InboxButton" Style="{StaticResource ActionButton}" Content="Odpowiedzi" />
-          </WrapPanel>
-          <TextBlock Text="Ostatni wynik / odebrane wiadomości" FontSize="15" Margin="0,12,0,4" />
-          <TextBox x:Name="OutputBox" MinHeight="145" MaxHeight="320"
-                   IsReadOnly="True" FontFamily="Consolas" FontSize="15"
-                   TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                   Foreground="#E4F3FE" Background="#152338" Padding="10" />
-        </StackPanel>
       </StackPanel>
     </ScrollViewer>
     <TextBlock x:Name="BottomStatus" Grid.Row="2" Margin="8,12,8,4"
@@ -147,7 +148,7 @@ function AgentRequest([string]$Method, [string]$Endpoint, [object]$Payload = $nu
         Uri = "http://127.0.0.1:8765$Endpoint"
         Method = $Method
         Headers = @{ Authorization = "Bearer $token" }
-        TimeoutSec = 12
+        TimeoutSec = 3
     }
     if ($null -ne $Payload) {
         $params.ContentType = "application/json; charset=utf-8"
@@ -157,6 +158,25 @@ function AgentRequest([string]$Method, [string]$Endpoint, [object]$Payload = $nu
 }
 function ShowResult([object]$Result) {
     (Get-UIElement "OutputBox").Text = (ConvertTo-Json -InputObject $Result -Depth 7)
+}
+function RefreshConversation {
+    $selection = (Get-UIElement "AgentSelector").SelectedItem
+    if ($null -eq $selection) { return }
+    $agent = [string]$selection.Content
+    $encoded = [uri]::EscapeDataString($agent)
+    $result = AgentRequest "GET" "/v1/conversation?agent=$encoded&limit=100"
+    $items = @($result.messages | Where-Object { $null -ne $_ })
+    $lines = New-Object 'System.Collections.Generic.List[string]'
+    foreach ($item in $items) {
+        $line = "{0} → {1} [{2}]" -f $item.sender, $item.recipient, $item.state
+        $lines.Add($line)
+        $lines.Add([string]$item.text)
+        $lines.Add("")
+    }
+    $output = Get-UIElement "OutputBox"
+    if ($lines.Count -eq 0) { $output.Text = "Brak wiadomości w tym kanale." }
+    else { $output.Text = [string]::Join([Environment]::NewLine, $lines) }
+    $output.ScrollToEnd()
 }
 (Get-UIElement "CloseButton").Add_Click({ $window.Close() })
 (Get-UIElement "MinimizeButton").Add_Click({ $window.WindowState = "Minimized" })
@@ -184,8 +204,12 @@ function ShowResult([object]$Result) {
     catch { (Get-UIElement "OutputBox").Text = $_.Exception.Message }
 })
 (Get-UIElement "InboxButton").Add_Click({
-    try { ShowResult (AgentRequest "GET" "/v1/inbox?recipient=user") }
-    catch { (Get-UIElement "OutputBox").Text = $_.Exception.Message }
+    try { RefreshConversation }
+    catch { (Get-UIElement "BottomStatus").Text = $_.Exception.Message }
+})
+(Get-UIElement "AgentSelector").Add_SelectionChanged({
+    try { RefreshConversation }
+    catch { (Get-UIElement "BottomStatus").Text = "Serwer agentów niedostępny — panel systemowy działa." }
 })
 (Get-UIElement "SendButton").Add_Click({
     try {
@@ -194,11 +218,24 @@ function ShowResult([object]$Result) {
         $message = (Get-UIElement "MessageBox").Text.Trim()
         if (-not $message) { throw "Wpisz wiadomość." }
         if ($message.Length -gt 4000) { throw "Maksymalnie 4000 znaków." }
-        ShowResult (AgentRequest "POST" "/v1/messages" @{sender="user";recipient=$to;message=$message})
+        $null = AgentRequest "POST" "/v1/messages" @{sender="user";recipient=$to;message=$message}
+        RefreshConversation
         (Get-UIElement "MessageBox").Clear()
+        (Get-UIElement "BottomStatus").Text = "Wysłano do lokalnej kolejki. Dostarczenie do modelu zależy od połączenia bramy."
     } catch { (Get-UIElement "OutputBox").Text = $_.Exception.Message }
 })
 $window.Add_KeyDown({
     if ($_.Key -eq [System.Windows.Input.Key]::Escape) { $window.WindowState = "Minimized" }
 })
+$timer = [System.Windows.Threading.DispatcherTimer]::new()
+$timer.Interval = [TimeSpan]::FromSeconds(8)
+$timer.Add_Tick({
+    if ($window.WindowState -ne [System.Windows.WindowState]::Minimized) {
+        try { RefreshConversation }
+        catch { (Get-UIElement "BottomStatus").Text = "Brak połączenia z serwerem wiadomości. Sprawdź konfigurację." }
+    }
+})
+$window.Add_Closed({ $timer.Stop() })
+$timer.Start()
+try { RefreshConversation } catch { (Get-UIElement "BottomStatus").Text = "Serwer wiadomości offline — możesz korzystać z pulpitu." }
 [void]$window.ShowDialog()
