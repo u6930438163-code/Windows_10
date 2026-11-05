@@ -1,0 +1,30 @@
+name: Windows installer static checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/linux/**'
+      - '.github/workflows/linux-install-check.yml'
+  pull_request:
+    paths:
+      - 'scripts/linux/**'
+      - '.github/workflows/linux-install-check.yml'
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Bash syntax
+        shell: bash
+        run: |
+          bash -n scripts/linux/check-kvm.sh
+          bash -n scripts/linux/windows10-kvm.sh
+      - name: Check safety guardrails
+        shell: bash
+        run: |
+          grep -q '127.0.0.1:1' scripts/linux/windows10-kvm.sh
+          grep -q '127.0.0.1:6080' scripts/linux/windows10-kvm.sh
+          grep -q '/dev/kvm' scripts/linux/windows10-kvm.sh
+      - name: Show offline usage
+        shell: bash
+        run: bash scripts/linux/windows10-kvm.sh --help
