@@ -75,5 +75,45 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(request.get_header("Authorization"), "Bearer dummy-for-tests")
 
 
+    def test_conversation_isolated_by_agent(self):
+        b = self.make_bridge()
+        b.send("user", "Alex", "Pytanie do Alexa")
+        b.send("user", "Aria", "Pytanie do Arii")
+        b.send("Alex", "user", "Odpowiedź Alexa")
+        only_alex = b.conversation("Alex")
+        self.assertEqual([row["text"] for row in only_alex],
+                         ["Pytanie do Alexa", "Odpowiedź Alexa"])
+        only_aria = b.conversation("Aria")
+        self.assertEqual([row["text"] for row in only_aria], ["Pytanie do Arii"])
+
+    def test_everyone_channel_includes_agent_to_agent(self):
+        b = self.make_bridge()
+        b.send("Astyria", "Aurelius", "Współpraca")
+        b.send("user", "all", "Wspólny komunikat")
+        rows = b.conversation("all")
+        self.assertEqual(len(rows), 5)
+        self.assertEqual(rows[0]["sender"], "Astyria")
+        self.assertEqual([m["id"] for m in rows], sorted(m["id"] for m in rows))
+
+    def test_conversation_limits_and_invalid_agent(self):
+        b = self.make_bridge()
+        for index in range(4):
+            b.send("user", "Aria", "Wiadomość " + str(index))
+        messages = b.conversation("Aria", limit=2)
+        self.assertEqual([m["text"] for m in messages],
+                         ["Wiadomość 2", "Wiadomość 3"])
+        with self.assertRaises(ValueError):
+            b.conversation("fake")
+
+    def test_deferred_delivery_is_not_reported_as_accepted(self):
+        b = Bridge(db_path=self.db, gateway_url="https://agents.example",
+                   send_path="/send", token="dummy-for-tests")
+        with patch("bridge.urlopen") as mock:
+            result = b.send("user", "Alex", "Do kolejki", deliver=False)
+        self.assertEqual(result[0]["state"], "queued")
+        mock.assert_not_called()
+
+
+
 if __name__ == "__main__":
     unittest.main()
