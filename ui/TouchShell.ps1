@@ -174,9 +174,13 @@ function RefreshConversation {
         $lines.Add("")
     }
     $output = Get-UIElement "OutputBox"
-    if ($lines.Count -eq 0) { $output.Text = "Brak wiadomości w tym kanale." }
-    else { $output.Text = [string]::Join([Environment]::NewLine, $lines) }
-    $output.ScrollToEnd()
+    $nextText = if ($lines.Count -eq 0) { "Brak wiadomości w tym kanale." }
+                else { [string]::Join([Environment]::NewLine, $lines) }
+    # Nie przerywaj przewijania palcem, jeśli w historii nic się nie zmieniło.
+    if ($output.Text -ne $nextText) {
+        $output.Text = $nextText
+        $output.ScrollToEnd()
+    }
 }
 (Get-UIElement "CloseButton").Add_Click({ $window.Close() })
 (Get-UIElement "MinimizeButton").Add_Click({ $window.WindowState = "Minimized" })
