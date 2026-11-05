@@ -23,3 +23,19 @@ jobs:
           }
           if ($errorsFound) { exit 1 }
           Write-Host 'Skrypty PowerShell poprawne skladniowo.'
+      - name: Validate touch XAML markup
+        shell: powershell
+        run: |
+          $source = Get-Content -Path ui/TouchShell.ps1 -Raw
+          $start = "[xml]" + '$layout' + " = @'"
+          $startIndex = $source.IndexOf($start)
+          if ($startIndex -lt 0) { throw 'Nie znaleziono bloku XAML' }
+          $xmlStart = $startIndex + $start.Length
+          $endIndex = $source.IndexOf("'@", $xmlStart)
+          if ($endIndex -le $xmlStart) { throw 'Niedomkniety blok XAML' }
+          $content = $source.Substring($xmlStart, $endIndex - $xmlStart)
+          [xml]$markup = $content
+          if ($markup.DocumentElement.LocalName -ne 'Window') {
+            throw 'Niepoprawny element glowny interfejsu'
+          }
+          Write-Host 'Pulpit dotykowy ma poprawna skladnie XML.'
