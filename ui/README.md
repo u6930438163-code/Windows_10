@@ -67,3 +67,7 @@ Panel działa również bez serwera agentów — przyciski systemowe są niezale
 - Realny dotyk wymaga sprzętowej obsługi dotyku albo poprawnej obsługi przez sesję zdalną. Wirtualny Windows z samym emulowanym wskaźnikiem myszy nie zyskuje funkcji multitouch.
 - Tryb tabletu dotyczy Windows 10 (Windows 11 zachowuje się inaczej).
 - Zakończenie standardowego wsparcia Windows 10: **14 października 2025 r.** Używaj aktualizacji ESU, jeśli są dostępne dla Twojej edycji, lub wspieranego systemu.
+
+## Szybki start — jedno polecenie
+
+Jeżeli masz Pythona, wygodniej uruchomić `scripts/Launch-TouchWorkspace.ps1`. Skrypt uruchamia serwer agentów na `127.0.0.1:8765`, przekazuje wygenerowany losowy token obu procesom i otwiera panel dotykowy. Po zamknięciu panelu zatrzymuje **tylko** utworzony przez siebie serwer. Alternatywnie `-WithoutAgentServer` włącza sam panel. Dla skrótu na pulpicie użyj `scripts/Install-TouchShortcut.ps1 -Create`.
