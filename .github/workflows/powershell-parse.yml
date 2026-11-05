@@ -1,0 +1,25 @@
+name: PowerShell parse check
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  parse:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse PowerShell files
+        shell: pwsh
+        run: |
+          $errorsFound = $false
+          Get-ChildItem -Path scripts -Filter '*.ps1' -Recurse | ForEach-Object {
+            $tokens = $null
+            $parseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$parseErrors) | Out-Null
+            if ($parseErrors.Count -gt 0) {
+              $parseErrors | ForEach-Object { Write-Error $_.ToString() }
+              $errorsFound = $true
+            }
+          }
+          if ($errorsFound) { exit 1 }
+          Write-Host 'Skrypty PowerShell poprawne skladniowo.'
