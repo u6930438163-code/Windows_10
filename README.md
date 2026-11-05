@@ -1,5 +1,17 @@
 # Windows_10
 
+## Instalator czystego Windows 10 z repozytorium
+
+Przygotowano instalator Windows 10 działający na **serwerze Linux x86_64 z KVM**. Przygotowuje nowy pusty dysk wirtualny, uruchamia instalator z **oryginalnego ISO Microsoft** i lokalny panel noVNC. **Sam GitHub nie uruchamia systemu Windows**; potrzeba serwera, poprawnego prawa do uruchomienia Windows i bezpiecznego dostępu do pulpitu.
+
+```bash
+bash scripts/linux/check-kvm.sh
+bash scripts/linux/windows10-kvm.sh --iso /opt/iso/Win10.iso
+bash scripts/linux/windows10-kvm.sh --iso /opt/iso/Win10.iso --start
+```
+
+**Instrukcja instalacji z telefonu:** [INSTALATOR-REPO-WINDOWS10.md](docs/INSTALATOR-REPO-WINDOWS10.md). Skrypt nie instaluje dodatkowych aplikacji ani agentów. Nie wystawia noVNC bez uwierzytelnienia.
+
 Windows 10 — czysty projekt konfiguracyjny: instalacja systemu, **dotykowy pulpit Windows**, wirtualizacja, narzędzia OpenAI oraz lokalne kanały czterech istniejących agentów **Alex, Aria, Astyria, Aurelius**.
 
 **To nie jest obraz ISO ani kopia systemu Windows.** Repozytorium zawiera skrypty i instrukcje. Uruchomienie funkcji wymaga urządzenia z Windows 10 i odpowiedniego sprzętu. Licencji, ISO oraz sekretów nie umieszczamy na GitHubie.
