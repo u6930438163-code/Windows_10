@@ -13,6 +13,8 @@ python agents/agentctl.py send --from Aria --to Astyria --text "Prośba o wspó�
 python agents/agentctl.py send --from user --to all --text "Raport statusu"
 python agents/agentctl.py inbox --agent user
 python agents/agentctl.py inbox --agent Alex
+python agents/agentctl.py conversation --agent Alex
+python agents/agentctl.py conversation --agent all
 ```
 
 Komunikaty są przechowywane lokalnie. **Bez działającego backendu AI będą miały stan `queued`**, czyli nie oznaczają, że model cokolwiek przeczytał lub odpowiedział. Komunikat z agenta do `user` trafia do lokalnej skrzynki `user`.
@@ -43,6 +45,8 @@ Serwer nasłuchuje **tylko na 127.0.0.1**, każde wywołanie wymaga `Authorizati
 
 - `GET /v1/agents` – znane tożsamości i konfiguracja bramy.
 - `GET /v1/inbox?recipient=Alex&since=0` – skrzynka.
+- `GET /v1/conversation?agent=Alex&limit=100` – historia rozmowy użytkownika z Alexem.
+- `GET /v1/conversation?agent=all&limit=100` – kanał zbiorczy, także wymiana agent–agent.
 - `POST /v1/messages` – JSON `{"sender":"user","recipient":"Aria","message":"Cześć"}`.
 
 To **nie** jest publiczny serwer przeznaczony do wystawiania w Internecie. Token lokalny daje dostęp do wszystkich skrzynek — nie należy go udostępniać niezaufanym użytkownikom.
@@ -66,4 +70,8 @@ W aplikacji obsługującej MCP dodaj serwer stdio wskazujący interpreter Python
 
 ## Panel dotykowy Windows
 
-Uruchom `scripts/Start-TouchShell.ps1` (Windows PowerShell 5.1, WPF). Panel pozwala wybierać odbiorcę palcem i wysyłać wiadomości do lokalnej skrzynki. Instrukcja: [ui/README.md](../ui/README.md). Panel działa niezależnie od zewnętrznego backendu, ale **bez sprawnego API agentów nie generuje ich odpowiedzi**.
+Uruchom `scripts/Launch-TouchWorkspace.ps1` (Windows PowerShell 5.1, WPF). Panel pozwala wybierać odbiorcę palcem i wysyłać wiadomości do lokalnej skrzynki. Instrukcja: [ui/README.md](../ui/README.md). Panel działa niezależnie od zewnętrznego backendu, ale **bez sprawnego API agentów nie generuje ich odpowiedzi**.
+
+## Odświeżanie i responsywność dotykowego czatu
+
+Panel wyświetla faktyczny zapis historii z SQLite i automatycznie odświeża go co 8 sekund. Dla lepszej responsywności HTTP przyjmuje wysyłane wiadomości do lokalnej kolejki i zwraca **202 Accepted**; zewnętrzny backend obsługiwany jest osobnym workerem. Stan `queued` nie oznacza, że agent rozpoczął pracę. Stan `accepted` potwierdza jedynie odbiór przez bramę; `failed` oznacza błąd transportu. Historia jest aktualizowana w kolejnym odświeżeniu. Gdy serwer jest zatrzymany, panel dotykowy dalej udostępnia funkcje Windows.
