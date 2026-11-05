@@ -4,6 +4,25 @@ Windows 10 — czysty projekt konfiguracyjny: instalacja systemu, **dotykowy pul
 
 **To nie jest obraz ISO ani kopia systemu Windows.** Repozytorium zawiera skrypty i instrukcje. Uruchomienie funkcji wymaga urządzenia z Windows 10 i odpowiedniego sprzętu. Licencji, ISO oraz sekretów nie umieszczamy na GitHubie.
 
+## Instalacja czystego Windows 10 (priorytet)
+
+1. Pobierz oficjalny obraz ISO ze strony <https://www.microsoft.com/pl-pl/software-download/windows10>.
+2. Na komputerze z włączonym Hyper-V, w PowerShell, wykonaj **plan bez zmian**:
+
+```powershell
+.\scripts\Start-Windows10Setup.ps1 -IsoPath "C:\ISO\Win10.iso"
+```
+
+3. Aby utworzyć i uruchomić nową maszynę (po potwierdzeniu):
+
+```powershell
+.\scripts\Start-Windows10Setup.ps1 -IsoPath "C:\ISO\Win10.iso" -Create -Boot
+```
+
+4. Połącz się z VM w Hyper-V Manager i dokończ instalator Microsoft.
+
+Szczegóły: [Instalacja w Hyper-V](docs/WINDOWS-VM.md). Samo ChatGPT nie uruchamia pełnej maszyny Windows, a Codespaces nie udostępnia natywnego hosta Windows.
+
 ## Pulpit dotykowy — uruchom
 
 Na komputerze Windows, w PowerShell:
