@@ -95,6 +95,28 @@ class Bridge:
             ).fetchall()
         return [self._record(row) for row in rows]
 
+    def conversation(self, agent, since=0, limit=100):
+        """Historia rozmowy użytkownika z agentem lub zbiorczy kanał 'all'."""
+        agent = normalize(agent, allow_all=True)
+        since = max(int(since), 0)
+        limit = max(1, min(int(limit), 200))
+        with closing(sqlite3.connect(self.db_path)) as conn:
+            if agent == "all":
+                rows = conn.execute(
+                    "SELECT id,created_at,sender,recipient,text,state,error FROM messages "
+                    "WHERE id>? ORDER BY id DESC LIMIT ?",
+                    (since, limit),
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    "SELECT id,created_at,sender,recipient,text,state,error FROM messages "
+                    "WHERE ((sender='user' AND recipient=?) "
+                    "OR (sender=? AND recipient='user')) AND id>? "
+                    "ORDER BY id DESC LIMIT ?",
+                    (agent, agent, since, limit),
+                ).fetchall()
+        return [self._record(row) for row in reversed(rows)]
+
     def status(self):
         return {
             "agents": list(AGENTS),
