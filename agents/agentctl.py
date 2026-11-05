@@ -46,6 +46,12 @@ def serve(bridge, port):
                     recipient = args.get("recipient", ["user"])[0]
                     since = int(args.get("since", ["0"])[0])
                     self.reply(200, {"messages": bridge.inbox(recipient, since)})
+                elif parsed.path == "/v1/conversation":
+                    args = parse_qs(parsed.query)
+                    agent = args.get("agent", ["all"])[0]
+                    since = int(args.get("since", ["0"])[0])
+                    limit = int(args.get("limit", ["100"])[0])
+                    self.reply(200, {"messages": bridge.conversation(agent, since, limit)})
                 else:
                     self.reply(404, {"error": "not found"})
             except (ValueError, TypeError) as exc:
@@ -83,6 +89,10 @@ def main():
     inbox = sub.add_parser("inbox")
     inbox.add_argument("--agent", required=True)
     inbox.add_argument("--since", type=int, default=0)
+    conversation = sub.add_parser("conversation")
+    conversation.add_argument("--agent", required=True)
+    conversation.add_argument("--since", type=int, default=0)
+    conversation.add_argument("--limit", type=int, default=100)
     retry = sub.add_parser("retry")
     retry.add_argument("--id", type=int, required=True)
     server = sub.add_parser("serve")
@@ -96,6 +106,7 @@ def main():
         "status": bridge.status,
         "send": lambda: bridge.send(args.sender, args.recipient, args.text),
         "inbox": lambda: bridge.inbox(args.agent, args.since),
+        "conversation": lambda: bridge.conversation(args.agent, args.since, args.limit),
         "retry": lambda: bridge.retry(args.id),
     }[args.cmd]()
     print(json.dumps(result, indent=2, ensure_ascii=False))
