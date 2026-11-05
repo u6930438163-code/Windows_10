@@ -26,7 +26,7 @@ Duże przyciski uruchamiają:
 - Klawiaturę dotykową (`TabTip.exe`) lub alternatywną ekranową (`osk.exe`).
 - PowerShell, Menedżera zadań.
 - ChatGPT, Codex i przeglądarkę (strony oficjalne).
-- Panel czatu Alex/Aria/Astyria/Aurelius oraz odbiór wiadomości.
+- Duży panel czatu Alex/Aria/Astyria/Aurelius, kanał **all**, historia zapisanych wiadomości i automatyczne odświeżanie co 8 sekund.
 
 Wbudowane gesty systemowe Windows (przesuwanie, przewijanie, dotknięcie, długie przytrzymanie i powiększanie) działają na sprzęcie obsługującym dotyk; nasza aplikacja korzysta ze standardowej obsługi dotyku WPF. **Nie modyfikujemy zachowania wszystkich obcych aplikacji** i nie instalujemy wirtualnych sterowników dotyku.
 
@@ -71,3 +71,9 @@ Panel działa również bez serwera agentów — przyciski systemowe są niezale
 ## Szybki start — jedno polecenie
 
 Jeżeli masz Pythona, wygodniej uruchomić `scripts/Launch-TouchWorkspace.ps1`. Skrypt uruchamia serwer agentów na `127.0.0.1:8765`, przekazuje wygenerowany losowy token obu procesom i otwiera panel dotykowy. Po zamknięciu panelu zatrzymuje **tylko** utworzony przez siebie serwer. Alternatywnie `-WithoutAgentServer` włącza sam panel. Dla skrótu na pulpicie użyj `scripts/Install-TouchShortcut.ps1 -Create`.
+
+## Nawigacja po czacie dotykiem
+
+Po uruchomieniu chat jest pierwszą sekcją na pełnym ekranie. Wybierz kanał z listy, przejrzyj dużą historię wiadomości, dotknij pola tekstowego i użyj przycisku **Wyślij**. Pod historią jest skrót **Odśwież rozmowę**, a automatyczne sprawdzanie nowych wiadomości uruchamia się co 8 sekund. Niżej są przyciski całego systemu. Wybór `all` pokazuje kanał wspólny, w tym lokalne wiadomości agent–agent. Przewijanie widoku działa przeciągnięciem palcem.
+
+Nie są generowane pozorne odpowiedzi agentów: `queued` oznacza kolejkę, `accepted` przyjęcie przez skonfigurowaną bramę, a `inbox` prawdziwie odebraną wiadomość. Jeśli brama nie jest skonfigurowana, nie ma odpowiedzi modelu.
