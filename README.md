@@ -4,6 +4,12 @@ Windows 10 — czysty projekt konfiguracyjny: instalacja systemu, **dotykowy pul
 
 **To nie jest obraz ISO ani kopia systemu Windows.** Repozytorium zawiera skrypty i instrukcje. Uruchomienie funkcji wymaga urządzenia z Windows 10 i odpowiedniego sprzętu. Licencji, ISO oraz sekretów nie umieszczamy na GitHubie.
 
+## Windows 10 z telefonu — pełny pulpit w przeglądarce
+
+[Instrukcja instalacji pełnego Windows 10 na serwerze KVM z obsługą noVNC na Androidzie](docs/INSTALACJA-CHMURA-ANDROID.md).
+
+Na telefonie nie potrzebujesz lokalnego Windows ani Hyper-V, ale potrzebujesz oddzielnego serwera KVM z konsolą HTML5, oficjalnego ISO i odpowiedniego prawa do używania/licencjonowania Windows 10 w chmurze. **Nie utworzono ani nie opłacono serwera.**
+
 ## Instalacja czystego Windows 10 (priorytet)
 
 1. Pobierz oficjalny obraz ISO ze strony <https://www.microsoft.com/pl-pl/software-download/windows10>.
