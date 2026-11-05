@@ -126,7 +126,7 @@ class Bridge:
             "note": "Tożsamości istnieją; aktywność modeli i workerów nie jest potwierdzona.",
         }
 
-    def send(self, sender, recipient, text):
+    def send(self, sender, recipient, text, deliver=True):
         sender = normalize(sender)
         recipient = normalize(recipient, allow_all=True)
         if not isinstance(text, str) or not text.strip() or len(text) > 4000:
@@ -138,7 +138,7 @@ class Bridge:
         result = []
         for target in recipients:
             msg_id = self._save(sender, target, text, "inbox" if target == "user" else "queued")
-            if target != "user" and self.gateway_url and self.send_path:
+            if deliver and target != "user" and self.gateway_url and self.send_path:
                 self._deliver(msg_id)
             result.append(self.get(msg_id))
         return result
